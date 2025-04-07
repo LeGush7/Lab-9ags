@@ -1,35 +1,110 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <title>Best store!</title>
-    <script type="text/javascript" src="/static/update.js"></script>
-    <link href="static/store.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отзывы с оценкой</title>
+    <style>
+        body {
+            font-family: Times New Roman, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .review-form {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            resize: none;
+        }
+        .rating {
+            margin-bottom: 15px;
+        }
+        .stars {
+            font-size: 24px;
+            color: gold;
+            margin-bottom: 10px;
+        }
+        .review {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .review:last-child {
+            border-bottom: none;
+        }
+        .date {
+            color: #777;
+            font-size: 0.9em;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        button.clear {
+            background-color: #f44336;
+        }
+        .avg-rating {
+            font-weight: bold;
+            margin: 15px 0;
+        }
+    </style>
 </head>
-
 <body>
-    <h1>Furniture store:</h1>
-    <h3>Add new product:</h3>
-    <form>
-        <div>
-            <input type="text" name="prod_name" id="prod_name">
-            <label for="prod_name">Product name</label>
+    <div class="container">
+        <h1>Отзывы</h1>
+
+        <div class="avg-rating">
+            Средний рейтинг: {{ avg_rating }} ★
         </div>
-        <div>
-            <input type="number" name="price" id="price">
-            <label for="price">Price (rub.)</label>
-        </div>
-        <button onClick="addProduct()">Add</button>
-    </form>
-    <ul>
-        {% for product in products_list %}
-        <li>
-            <div>
-                <div>{{ product['prod_name'] }}</div>
-                <div>{{ product['price'] }} rub.</div>
-                <input value="{{product['id']}}" onChange="updateProd(this)" name="in_stock" type="checkbox" {% if product.in_stock %} checked {% endif %}>
-                <label for="in_stock">In stock</label>
+
+        <form method="POST" action="{{ url_for('index') }}" class="review-form">
+            <textarea name="text" placeholder="Ваш отзыв" required></textarea>
+            <div class="rating">
+                Оценка:
+                <select name="rate" required>
+                    <option value="1">1 ★</option>
+                    <option value="2">2 ★★</option>
+                    <option value="3">3 ★★★</option>
+                    <option value="4">4 ★★★★</option>
+                    <option value="5">5 ★★★★★</option>
+                </select>
             </div>
-        </li>
+            <button type="submit">Добавить отзыв</button>
+        </form>
+
+        <form method="POST" action="{{ url_for('clear_reviews') }}">
+            <button type="submit" class="clear">Очистить все отзывы</button>
+        </form>
+
+        {% for review in reviews %}
+        <div class="review">
+            <div class="stars">
+                {{ '★' * review.rate }}{{ '☆' * (5 - review.rate) }}
+            </div>
+            <p>{{ review.text }}</p>
+            <div class="date">{{ review.date.strftime('%d.%m.%Y %H:%M') }}</div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 </body>
 </html>
